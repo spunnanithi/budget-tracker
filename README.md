@@ -8,6 +8,32 @@ Tech Used:
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Prisma Commands
+
+- Turn db schema into Prisma schema
+
+```bash
+prisma db pull
+```
+
+- Generate Prisma Client, then can start querying the db
+
+```bash
+prisma generate
+```
+
+- Migrate db
+
+```bash
+npx prisma migrate dev
+```
+
+- Go to Prisma Studio UI for db visualization
+
+```bash
+npx prisma studio
+```
+
 ## Getting Started
 
 First, run the development server:
