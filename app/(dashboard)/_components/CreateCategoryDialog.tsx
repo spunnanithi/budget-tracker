@@ -32,11 +32,15 @@ import {
 	CreateCategorySchemaType,
 } from "@/schema/categories";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CircleOff, PlusSquare } from "lucide-react";
-import React, { useState } from "react";
+import { CircleOff, Loader2, PlusSquare } from "lucide-react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreateCategory } from "../_actions/categories";
+import { Category } from "@prisma/client";
+import { toast } from "sonner";
 
 interface Props {
 	type: TransactionType;
@@ -51,6 +55,45 @@ function CreateCategoryDialog({ type }: Props) {
 			type,
 		},
 	});
+
+	const queryClient = useQueryClient();
+
+	const { mutate, isPending } = useMutation({
+		mutationFn: CreateCategory,
+		onSuccess: async (data: Category) => {
+			form.reset({
+				name: "",
+				icon: "",
+				type,
+			});
+
+			toast.success(`Category ${data.name} created sucessfully`, {
+				id: "create-category",
+			});
+
+			await queryClient.invalidateQueries({
+				queryKey: ["categories"],
+			});
+
+			setOpen((prev) => !prev);
+		},
+		onError: () => {
+			toast.error("Something went wrong. Could not create category", {
+				id: "create-category",
+			});
+		},
+	});
+
+	const onSubmit = useCallback(
+		(values: CreateCategorySchemaType) => {
+			toast.loading("Creating category...", {
+				id: "create-category",
+			});
+
+			mutate(values);
+		},
+		[mutate]
+	);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -80,7 +123,7 @@ function CreateCategoryDialog({ type }: Props) {
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
-					<form className="space-y-8">
+					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 						{/* Category Name */}
 						<FormField
 							control={form.control}
@@ -157,7 +200,9 @@ function CreateCategoryDialog({ type }: Props) {
 							Cancel
 						</Button>
 					</DialogClose>
-					<Button>Save</Button>
+					<Button onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
+						{isPending ? <Loader2 className="animate-spin" /> : "Create"}
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
