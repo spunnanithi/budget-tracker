@@ -8,8 +8,16 @@ import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "./ui/button";
 import { UserButton } from "@clerk/nextjs";
 import { ThemeSwticherButton } from "./ThemeSwitcherButton";
-import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
+import {
+	Sheet,
+	SheetTrigger,
+	SheetContent,
+	SheetTitle,
+	SheetDescription,
+	SheetHeader,
+} from "./ui/sheet";
 import { Menu } from "lucide-react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 function Navbar() {
 	return (
@@ -39,6 +47,11 @@ function MobileNavbar() {
 						</Button>
 					</SheetTrigger>
 					<SheetContent className="w-[400px] sm:w-[540px]" side="left">
+						<VisuallyHidden>
+							<SheetTitle>Navigation</SheetTitle>
+							<SheetDescription>Navigation</SheetDescription>
+						</VisuallyHidden>
+
 						<Logo />
 						<div className="flex flex-col gap-1 pt-4">
 							{navItems.map((item) => (
