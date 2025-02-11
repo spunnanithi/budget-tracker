@@ -46,59 +46,59 @@ export async function CreateTransaction(form: CreateTransactionSchemaType) {
 				categoryIcon: categoryRow.icon,
 			},
 		}),
-	]);
 
-	// 2. Update month aggregates table
-	prisma.monthHistory.upsert({
-		where: {
-			day_month_year_userId: {
+		// 2. Update month aggregates table
+		prisma.monthHistory.upsert({
+			where: {
+				day_month_year_userId: {
+					userId: user.id,
+					day: date.getUTCDate(),
+					month: date.getUTCMonth(),
+					year: date.getUTCFullYear(),
+				},
+			},
+			create: {
 				userId: user.id,
 				day: date.getUTCDate(),
 				month: date.getUTCMonth(),
 				year: date.getUTCFullYear(),
+				expense: type === "expense" ? amount : 0,
+				income: type === "income" ? amount : 0,
 			},
-		},
-		create: {
-			userId: user.id,
-			day: date.getUTCDate(),
-			month: date.getUTCMonth(),
-			year: date.getUTCFullYear(),
-			expense: type === "expense" ? amount : 0,
-			income: type === "income" ? amount : 0,
-		},
-		update: {
-			expense: {
-				increment: type === "expense" ? amount : 0,
+			update: {
+				expense: {
+					increment: type === "expense" ? amount : 0,
+				},
+				income: {
+					increment: type === "income" ? amount : 0,
+				},
 			},
-			income: {
-				increment: type === "income" ? amount : 0,
-			},
-		},
-	});
+		}),
 
-	// 3. Update year aggregates table
-	prisma.yearHistory.upsert({
-		where: {
-			month_year_userId: {
+		// 3. Update year aggregates table
+		prisma.yearHistory.upsert({
+			where: {
+				month_year_userId: {
+					userId: user.id,
+					month: date.getUTCMonth(),
+					year: date.getUTCFullYear(),
+				},
+			},
+			create: {
 				userId: user.id,
 				month: date.getUTCMonth(),
 				year: date.getUTCFullYear(),
+				expense: type === "expense" ? amount : 0,
+				income: type === "income" ? amount : 0,
 			},
-		},
-		create: {
-			userId: user.id,
-			month: date.getUTCMonth(),
-			year: date.getUTCFullYear(),
-			expense: type === "expense" ? amount : 0,
-			income: type === "income" ? amount : 0,
-		},
-		update: {
-			expense: {
-				increment: type === "expense" ? amount : 0,
+			update: {
+				expense: {
+					increment: type === "expense" ? amount : 0,
+				},
+				income: {
+					increment: type === "income" ? amount : 0,
+				},
 			},
-			income: {
-				increment: type === "income" ? amount : 0,
-			},
-		},
-	});
+		}),
+	]);
 }
